@@ -1,0 +1,8 @@
+pyproject.toml
+setup.py
+orange3_imagetools.egg-info/PKG-INFO
+orange3_imagetools.egg-info/SOURCES.txt
+orange3_imagetools.egg-info/dependency_links.txt
+orange3_imagetools.egg-info/entry_points.txt
+orange3_imagetools.egg-info/top_level.txt
+orangecontrib/__init__.py
