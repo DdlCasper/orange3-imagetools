@@ -40,9 +40,9 @@ class OWRegionPropsExtractor(OWWidget):
         'label', 'area', 'bbox', 'bbox_area', 'centroid', 'convex_area',
         'eccentricity', 'equivalent_diameter', 'euler_number', 'extent', 
         'filled_area', 'inertia_tensor', 'inertia_tensor_eigvals', 
-        'intensity_max', 'intensity_mean', 'intensity_min', 'local_centroid', 
+        'intensity_max', 'intensity_mean', 'intensity_min', 'intensity_std', 'intensity_median', 'local_centroid', 
         'major_axis_length', 'minor_axis_length', 'moments', 'moments_central', 
-        'moments_hu', 'moments_normalized', 'orientation', 'perimeter', 'solidity'
+        'moments_hu', 'moments_normalized', 'orientation', 'perimeter_crofton', 'solidity'
     ]
 
     def __init__(self):
