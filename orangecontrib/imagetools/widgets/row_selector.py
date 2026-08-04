@@ -26,7 +26,7 @@ class OWRowSelector(OWWidget):
 
         box = gui.widgetBox(self.controlArea, "Selection Settings")
         
-        gui.widgetLabel(box, "Insert indeces (es. 1, 3, 5-10):")
+        gui.widgetLabel(box, "Insert indices (es. 1, 3, 5-10):")
         
         
         self.line_edit = gui.lineEdit(
@@ -37,7 +37,7 @@ class OWRowSelector(OWWidget):
         
         self.cb_invert = gui.checkBox(
             box, self, "invert_selection", 
-            "Exclude selected indeces",
+            "Exclude selected indices",
             callback=self.commit  
         )
         
@@ -54,7 +54,7 @@ class OWRowSelector(OWWidget):
             self.Outputs.selected_data.send(None)
             return
 
-        # Parsiamo la stringa per ottenere una lista di indici da 0 a N-1
+        
         parsed_indices = self.parse_indices(self.indices_str, len(self.data))
 
         if not parsed_indices:

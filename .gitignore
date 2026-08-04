@@ -1,0 +1,9 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Orange/Setuptools build folders
+build/
+dist/
+*.egg-info/
+.vscode/
