@@ -7,3 +7,4 @@ build/
 dist/
 *.egg-info/
 .vscode/
+orangecontrib\imagetools\widgets\row_selector.py
