@@ -13,6 +13,7 @@ from skimage.measure import regionprops_table
 class OWRegionPropsExtractor(OWWidget):
     name = "Morphological features"
     description = "Extract quantitative morphological features from a labelled image using skimage.measure.regionprops."
+    icon = "morphology_measure.svg"
     priority = 100
 
     class Inputs:
