@@ -11,7 +11,6 @@ from orangecontrib.snom.preprocess.utils import (
 
 from scipy.ndimage import gaussian_filter, median_filter, uniform_filter
 from skimage.restoration import denoise_bilateral
-import numpy as np
 
 class SpatialFilterProcessor(PreprocessImageOpts2DOnlyWhole):
     def __init__(self, method="gaussian", mode="reflect", sigma=1.0, size=3, sigma_intensity=0.1):
