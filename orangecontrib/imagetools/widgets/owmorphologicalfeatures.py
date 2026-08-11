@@ -35,7 +35,7 @@ class OWRegionPropsExtractor(OWWidget):
     # Default properties
     selected_properties = Setting(['label', 'area', 'centroid'])
 
-    # Image properties from skimage regionprops (If you want to add more feature, check the list here: https://scikit-image.org/docs/0.25.x/api/skimage.measure.html#skimage.measure.regionprops)
+    # Image properties from skimage regionprops (If you want to add more feature, check the list here and: https://scikit-image.org/docs/0.25.x/api/skimage.measure.html#skimage.measure.regionprops)
     AVAILABLE_PROPS = [
         'label', 'area', 'bbox', 'bbox_area', 'centroid', 'convex_area',
         'eccentricity', 'equivalent_diameter', 'euler_number', 'extent', 
