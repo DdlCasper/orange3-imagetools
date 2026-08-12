@@ -8,3 +8,4 @@ dist/
 *.egg-info/
 .vscode/
 #orangecontrib/imagetools/widgets/row_selector.py
+.preprocess_snom
