@@ -1,9 +1,8 @@
 # orange3-imagetools
 ## INTRODUCTION
 This is a collection of tools for processing and analyzing spectroscopic images based on _scikit-image_ and _scipy_.  
-The package includes widgets for analyzing labeled/binary images to extract quantitative features such as area or centroids.  
-The **preprocess_snom** folder contains preprocessors that extend the functionalities of the image preprocessing widget from Quasar’s snom package (for more information: https://github.com/Quasars/orange-snom).
-
+The package includes a widget for analyzing labeled/binary images to extract quantitative features such as area or centroids.   
+An additional widget is available for text-based row selection.
 ## Morphological features widget
 <img width="883" height="654" alt="immagine" src="https://github.com/user-attachments/assets/c31409d9-2aef-4a38-9ef9-1f09eaba46b2" />
 
