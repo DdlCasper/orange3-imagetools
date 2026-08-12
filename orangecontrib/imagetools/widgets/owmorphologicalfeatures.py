@@ -6,7 +6,7 @@ from AnyQt.QtCore import Qt
 from Orange.widgets import gui
 from Orange.widgets.settings import Setting
 from Orange.widgets.widget import OWWidget, Input, Output
-from Orange.data import Table, Domain, ContinuousVariable
+from Orange.data import Table, Domain, ContinuousVariable, StringVariable, DiscreteVariable
 from Orange.widgets.utils.itemmodels import VariableListModel
 from skimage.measure import regionprops_table
 
@@ -42,7 +42,7 @@ class OWRegionPropsExtractor(OWWidget):
         'filled_area', 'inertia_tensor', 'inertia_tensor_eigvals', 
         'intensity_max', 'intensity_mean', 'intensity_min', 'intensity_std', 'intensity_median', 'local_centroid', 
         'major_axis_length', 'minor_axis_length', 'moments', 'moments_central', 
-        'moments_hu', 'moments_normalized', 'orientation', 'perimeter_crofton', 'solidity'
+        'moments_hu', 'moments_normalized', 'orientation', 'perimeter_crofton', 'solidity', 'feret_diameter_max'
     ]
 
     def __init__(self):
@@ -84,6 +84,7 @@ class OWRegionPropsExtractor(OWWidget):
         
         box_params = gui.widgetBox(self.controlArea, "Function settings")
         gui.checkBox(box_params, self, "enable_caching", "Enable Caching", callback=self.commit)
+        gui.checkBox(box_params, self, "enable_offset", "Include first label", callback=self.commit)
         gui.separator(box_params)
         gui.doubleSpin(box_params, self, "spacing_x", 0.001, 9999.0, 0.1, label="Spacing X:", callback=self.commit)
         gui.doubleSpin(box_params, self, "spacing_y", 0.001, 9999.0, 0.1, label="Spacing Y:", callback=self.commit)
@@ -197,7 +198,7 @@ class OWRegionPropsExtractor(OWWidget):
 
     #UTILITY FUNCTIONS 
 
-    def _table_to_2d_array(self, table, target_var_name, fill_value=0, is_integer=False):
+    def _table_to_2d_array(self, table, target_var_name, fill_value=0, is_integer=False, offset = 0):
         """We need to convert the table in a 2D numpy array"""
         if not target_var_name:
             return None
@@ -222,7 +223,11 @@ class OWRegionPropsExtractor(OWWidget):
 
         x_data = table.get_column_view(x_var)[0].astype(int)
         y_data = table.get_column_view(y_var)[0].astype(int)
+
         val_data = table.get_column_view(target_var)[0]
+        if offset != 0:
+            val_data = val_data + offset
+
         
         max_x, max_y = np.max(x_data), np.max(y_data)
         
@@ -241,8 +246,10 @@ class OWRegionPropsExtractor(OWWidget):
             self.Outputs.properties.send(None)
             return
 
+        offset_val = 1 if self.enable_offset else 0 
+
         # Build labled image
-        lbl_img = self._table_to_2d_array(self.labeled_data, self.selected_label_attr, fill_value=0, is_integer=True)
+        lbl_img = self._table_to_2d_array(self.labeled_data, self.selected_label_attr, fill_value=0, is_integer=True, offset=offset_val)
         if lbl_img is None:
             self.Outputs.properties.send(None)
             return
@@ -262,7 +269,7 @@ class OWRegionPropsExtractor(OWWidget):
         if not props_to_calc: #If there are no properties selected, return None
             self.Outputs.properties.send(None)
             return
-
+        
         # Prepeares arguments for sci-kit image
         kwargs = {'cache': self.enable_caching}
         
@@ -282,11 +289,17 @@ class OWRegionPropsExtractor(OWWidget):
             self.Outputs.properties.send(None)
             return
 
+        # Recovers original variable names
+        original_label_var = None
+        for var in self.labeled_data.domain.variables + self.labeled_data.domain.metas:
+            if var.name == self.selected_label_attr:
+                original_label_var = var
+                break
+
         domain_vars = []
         columns = []
         
         for key, val in res_dict.items():
-            # regionprops_table flattens features that are arrays (es. centroid-0, centroid-1)
             domain_vars.append(ContinuousVariable(key))
             columns.append(val)
 
@@ -294,10 +307,34 @@ class OWRegionPropsExtractor(OWWidget):
             self.Outputs.properties.send(None)
             return
 
-        # Create Table
+        # Prepares meta_Data
+        meta_vars = []
+        meta_columns = []
+        #If label is selected, then it creates a new column called region name as meta variable
+        if 'label' in res_dict and hasattr(original_label_var, 'values'):
+            # We create a Discrete Variable as meta
+            region_name_var = DiscreteVariable("region_name", values=original_label_var.values)
+            meta_vars.append(region_name_var)
+            
+            indices = []
+            for l in res_dict['label']:
+                idx = int(l) - offset_val
+                if 0 <= idx < len(original_label_var.values):
+                    indices.append(idx)
+                else:
+                    indices.append(np.nan) 
+            meta_columns.append(indices)
+
+        
         X_data = np.column_stack(columns)
-        domain = Domain(domain_vars)
-        out_table = Table(domain, X_data)
+        domain = Domain(domain_vars, metas=meta_vars)
+        
+        if meta_columns is not None:
+            metas_data = np.column_stack(meta_columns)
+            out_table = Table.from_numpy(domain, X=X_data, metas=metas_data)
+        else:
+            out_table = Table.from_numpy(domain, X=X_data)
+
         
         # Output
         self.Outputs.properties.send(out_table)
